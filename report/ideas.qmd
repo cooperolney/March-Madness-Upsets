@@ -1,0 +1,43 @@
+---
+title: "ideas"
+format: html
+---
+
+# Abstract
+- A one-paragraph abstract, giving a brief description of relevant data and any major findings.
+
+
+# Introduction
+- An introduction section, further introducing the data and giving the questions of interest you will be exploring in your project.
+
+Research Question: How have upsets in March Madness changed over time? Has the amount of upsets changed? Have the type of teams that go on Cinderella runs changed? Has the transfer portal and NIL impacted upsets?
+
+## Main Research Question: 
+How have March Madness upsets evolved over time, and what factors explain the rise or decline of Cinderella runs in the modern college basketball era?
+
+## Sub-Questions:
+1. How has the amount of upsets in March Madness changed over time? 
+2. What statistical characteristics define successful Cinderella team?
+3. Case Studies
+  - St. Peter's
+  - Loyola Chicago
+  - George Mason
+4. Has the rise of the transfer portal and NIL changed the likelihood of upsets?
+5. Final Takeaway
+
+
+# Visualizations
+- A section showing relevant visualizations. Keep in mind that you do not need to write this as though it is a “step-by-step” thought-process. Instead, you should include your most interesting visualizations, along with interpretations for each. This section will likely be the longest, and, if you are answering multiple different questions of interest, you might break this section up into subsections.
+
+- Plot 1: Show amount of upsets over time
+- Plot 2: Show what type of low seeded teams win games
+- Plot 3: Show why are there less upsets, due to NIL & transfer portal
+- Plot 4: Combine this data into a single plot
+
+
+# Conclusion
+- A concluding section describing future work that you would complete if you had more time as well as any limitations to your visualizations.
+
+
+
+

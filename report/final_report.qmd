@@ -8,26 +8,64 @@ format:
 ---
 
 # Abstract
-- A one-paragraph abstract, giving a brief description of relevant data and any major findings.
+
 
 
 # Introduction
-- An introduction section, further introducing the data and giving the questions of interest you will be exploring in your project.
+- Explain March Madness
 
-Research Question: How have upsets in March Madness changed over time? Has the amount of upsets changed? Have the type of teams that go on Cinderella runs changed? Has the transfer portal and NIL impacted upsets?
+- Define upsets & Cinderella teams, why they matter
+
+**Main Research Question**
+How have March Madness upsets evolved over time, and what factors explain the rise or decline of Cinderella runs in the modern college basketball era?
+
+- Sub-Questions/Roadmap:
+1. How has the amount of upsets in March Madness changed over time? 
+2. What statistical characteristics define successful Cinderella team?
+3. Case Studies: St. Peter's, Loyola Chicago, George Mason
+4. Has the rise of the transfer portal and NIL changed the likelihood of upsets?
+
 
 
 # Visualizations
-- A section showing relevant visualizations. Keep in mind that you do not need to write this as though it is a “step-by-step” thought-process. Instead, you should include your most interesting visualizations, along with interpretations for each. This section will likely be the longest, and, if you are answering multiple different questions of interest, you might break this section up into subsections.
 
-- Plot 1: Show amount of upsets over time
-- Plot 2: Show what type of low seeded teams win games
-- Plot 3: Show why are there less upsets, due to NIL & transfer portal
-- Plot 4: Combine this data into a single plot
+## Plot 1: The Rise/Fall of Upsets
+- How has the amount of upsets in March Madness changed over time? 
+- Plot idea: 
+```{r}
+# load data & create plot
+
+```
+
+
+## Plot 2: What does Cinderlla look like
+- What statistical characteristics define successful Cinderella team?
+- Plot idea:
+```{r}
+# load data & create plot
+
+```
+
+## Plot 3: Case Studies
+- St. Peter's, Loyola Chicago, George Mason, maybe other teams
+- Plot idea:
+```{r}
+# load data & create plot
+
+```
+
+## Plot 4: The Modern Era Shift
+- Has the rise of the transfer portal and NIL changed the likelihood of upsets?
+- Plot idea:
+```{r}
+# load data & create plot
+
+```
+
 
 
 # Conclusion
-- A concluding section describing future work that you would complete if you had more time as well as any limitations to your visualizations.
+- Tie the analysis of each plot together to determine if the amount of upsets have changed over time and why.
 
 
 
