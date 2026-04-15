@@ -29,34 +29,38 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 
 # Visualizations
 
-## Plot 1: The Rise/Fall of Upsets
+## Plot 1: 
 - How has the amount of upsets in March Madness changed over time? 
 - Plot idea: 
+- Data: upset count, upset seed info, seed results, tournament matchups
 ```{r}
 # load data & create plot
 
 ```
 
 
-## Plot 2: What does Cinderlla look like
+## Plot 2: 
 - What statistical characteristics define successful Cinderella team?
-- Plot idea:
+- Plot idea: 
+- Data: shooting split, team rankings, ken bart, evan miya, 538
 ```{r}
 # load data & create plot
 
 ```
 
-## Plot 3: Case Studies
+## Plot 3: 
 - St. Peter's, Loyola Chicago, George Mason, maybe other teams
 - Plot idea:
+- Data: team results, tournament matchups, resumes, coach results
 ```{r}
 # load data & create plot
 
 ```
 
-## Plot 4: The Modern Era Shift
+## Plot 4: 
 - Has the rise of the transfer portal and NIL changed the likelihood of upsets?
 - Plot idea:
+- Data: upset count, preseason ranks vs real ranks, 
 ```{r}
 # load data & create plot
 

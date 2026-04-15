@@ -25,6 +25,10 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 4. Has the rise of the transfer portal and NIL changed the likelihood of upsets?
 5. Final Takeaway
 
+## Data
+- Use the mm_data_kaggle datasets
+- Look for more data on NIL budgets, number of transfers, roster construction
+
 
 # Visualizations
 - A section showing relevant visualizations. Keep in mind that you do not need to write this as though it is a “step-by-step” thought-process. Instead, you should include your most interesting visualizations, along with interpretations for each. This section will likely be the longest, and, if you are answering multiple different questions of interest, you might break this section up into subsections.
@@ -33,6 +37,11 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 - Plot 2: Show what type of low seeded teams win games
 - Plot 3: Show why are there less upsets, due to NIL & transfer portal
 - Plot 4: Combine this data into a single plot
+
+- Plot 1: The Rise/Fall of Upsets
+- Plot 2: What does a Cinderella look like
+- Plot 3: Case Studies
+- Plot 4: The Modern Era Shift
 
 
 # Conclusion
