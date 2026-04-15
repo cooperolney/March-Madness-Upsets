@@ -10,6 +10,22 @@ format: html
 # Introduction
 - An introduction section, further introducing the data and giving the questions of interest you will be exploring in your project.
 
+**
+Maybe don't look at NIL and transfer portal as much because it is hard to find data on it. 
+
+Question: How have March Madness upsets evolved over time? Are there more or less in recent years? In recent years are what are the Cinderella teams good at?
+
+Or even simpler: In March Madness what makes at a team likely to go on a Cinderella run?
+- plot 1: look at amount of upsets over time, just to get a sense on how likely is an upset?
+- plot 2: look at stats like 3pt rate, off reb%... (on court stuff)
+- plot 3: look at experience, height, coaching, location, age of roster (other stuff)
+- plot 4: case studies: St. Peter's, Loyola Chicago, George Mason (see where the most famous Cinderella runs excelled)
+- plot 5: tie everything together somehow, like a regression prediction for 2026, and then can compare to actual results or something (predict the next Cinderella run, what team should have went on one in 2026 based on the data)
+**
+
+Maybe something with the week 6 top 25 AP poll could be interesting
+
+
 Research Question: How have upsets in March Madness changed over time? Has the amount of upsets changed? Have the type of teams that go on Cinderella runs changed? Has the transfer portal and NIL impacted upsets?
 
 ## Main Research Question: 

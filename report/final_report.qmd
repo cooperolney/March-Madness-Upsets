@@ -16,6 +16,8 @@ format:
 
 - Define upsets & Cinderella teams, why they matter
 
+
+
 **Main Research Question**
 How have March Madness upsets evolved over time, and what factors explain the rise or decline of Cinderella runs in the modern college basketball era?
 
@@ -26,15 +28,27 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 4. Has the rise of the transfer portal and NIL changed the likelihood of upsets?
 
 
+The data comes a group of datasets from Kaggle 
+
 
 # Visualizations
+```{r}
+library(tidyverse)
+```
+
+```{r}
+# Cleaning datasets
+
+```
 
 ## Plot 1: 
 - How has the amount of upsets in March Madness changed over time? 
 - Plot idea: 
 - Data: upset count, upset seed info, seed results, tournament matchups
 ```{r}
-# load data & create plot
+# clean data & create plot
+# use upset_count dataset, then change Year into a categorical var, and look at how total number of upsets changes through the years
+# could look at total or difference, maybe make two plots
 
 ```
 
@@ -45,6 +59,8 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 - Data: shooting split, team rankings, ken bart, evan miya, 538
 ```{r}
 # load data & create plot
+# look at 3pt rate, off reb % ...
+# then look at how teams are built 
 
 ```
 

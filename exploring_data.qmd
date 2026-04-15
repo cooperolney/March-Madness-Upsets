@@ -1,0 +1,117 @@
+---
+title: "exploring_data"
+format: html
+---
+
+```{r}
+library(devtools)
+library(tidyverse)
+```
+
+# ncaahoopR package
+```{r}
+install_github("lbenz730/ncaahoopR")
+library(ncaahoopR)
+library(dplyr)
+# not sure why dplyr will not load
+```
+
+```{r}
+team_colors <- ncaahoopR::ncaa_colors
+
+assist_net(team = "Oklahoma", node_col = "firebrick4", season = 400989185)
+```
+
+
+# amount of upsets in the first round
+scrap data from baksetball.org
+```{r}
+library(tidyverse)
+library(rvest)
+
+## provide the URL and name it something (in this case, url).
+url <- "https://www.basketball.org/stats/ncaa-first-round-upsets/"
+
+## convert the html code into something R can read
+h <- read_html(url)
+
+## grabs the tables
+tab <- h %>% html_nodes("table")
+
+objs <- tab %>% html_table()
+
+upsets <- objs[[1]]
+
+upsets_by_year <- objs[[2]]
+```
+
+
+# all upsets by individual games
+data from wiki NCAA Division I men's basketball tournament upsets
+```{r}
+url2 <- "https://en.wikipedia.org/wiki/NCAA_Division_I_men%27s_basketball_tournament_upsets"
+h2 <- read_html(url2)
+tab2 <- h2 %>% html_nodes("table")
+
+objs2 <- tab2 %>% html_table()
+
+round_64_16_over_1 <- objs2[[6]]
+```
+
+# Different URLs
+https://github.com/lbenz730/ncaahoopR
+https://www.formulabot.com/datasets/kenpom-march-madness
+https://www.kaggle.com/datasets/jonathanpilafas/2024-march-madness-statistical-analysis
+https://www.domo.com/blog/hoops-data-and-madness-unveiling-the-ultimate-ncaa-dashboard
+https://www.kaggle.com/datasets/nishaanamin/march-madness-data/data?select=EvanMiya.csv
+https://www.barttorvik.com/?year=2026&sort=&hteam=&t2value=&conlimit=All&state=All&begin=20251101&end=20260501&top=0&revquad=0&quad=5&venue=All&type=T&mingames=0#
+
+
+# march madness data from kaggle
+```{r}
+library(readr)
+upset_count <- read_csv(here::here("data/mm_data_kaggle/Upset Count.csv"))
+
+ken_bart <- read_csv(here::here("data/mm_data_kaggle/KenPom Barttorvik.csv"))
+```
+
+```{r}
+# data for plot 1
+
+upset_count <- read_csv(here::here("data/mm_data_kaggle/Upset Count.csv"))
+# has data from 2008-2025, counts the amount of upsets from each round and the total
+
+upset_seed_info <- read_csv(here::here("data/mm_data_kaggle/Upset Seed Info.csv"))
+# from 2008-2025, tracks the round and seeds of individual upset games
+
+seed_results <- read_csv(here::here("data/mm_data_kaggle/Seed Results.csv"))
+# has a row for each seed number, tracks win%,
+# looks like its tracks 17 tournaments so 2008-2025
+```
+
+```{r}
+# data for plot 2
+shooting_split <- read_csv(here::here("data/mm_data_kaggle/Shooting Splits.csv"))
+# data from 2010-2026, shooting rates & ranks
+
+team_rankings <- read_csv(here::here("data/mm_data_kaggle/TeamRankings.csv"))
+# data from 2008-2026, seed, round, wins & loss, highest & lowest ranks, consistency, luck
+
+ken_bart <- read_csv(here::here("data/mm_data_kaggle/KenPom Barttorvik.csv"))
+# data from 2008-2026, every adv stat, talent and experience score
+
+evan_miya <- read_csv(here::here("data/mm_data_kaggle/EvanMiya.csv"))
+# data from 2011-2026, different rates, pace/tempo stats
+
+rating_538 <- read_csv(here::here("data/mm_data_kaggle/538 Ratings.csv"))
+# data from 2016-2024, seed, overall power rating
+
+ap_top_12 <- read_csv(here::here("data/new_mm_datasets/REF _ Top 12 in AP Top 25 During Week 6.csv"))
+```
+
+
+
+
+
+
+
