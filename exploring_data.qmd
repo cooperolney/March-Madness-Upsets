@@ -107,6 +107,8 @@ rating_538 <- read_csv(here::here("data/mm_data_kaggle/538 Ratings.csv"))
 # data from 2016-2024, seed, overall power rating
 
 ap_top_12 <- read_csv(here::here("data/new_mm_datasets/REF _ Top 12 in AP Top 25 During Week 6.csv"))
+
+dev <- read_csv(here::here("data/new_mm_datasets/DEV _ March Madness.csv"))
 ```
 
 

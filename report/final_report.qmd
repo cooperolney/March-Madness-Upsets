@@ -19,13 +19,14 @@ format:
 
 
 **Main Research Question**
-How have March Madness upsets evolved over time, and what factors explain the rise or decline of Cinderella runs in the modern college basketball era?
+What team characteristics are associated with unexpected success in March Madness?
 
 - Sub-Questions/Roadmap:
-1. How has the amount of upsets in March Madness changed over time? 
-2. What statistical characteristics define successful Cinderella team?
-3. Case Studies: St. Peter's, Loyola Chicago, George Mason
-4. Has the rise of the transfer portal and NIL changed the likelihood of upsets?
+1. How common are upsets? (provides context)
+2. What on-court stats matter?
+3. What off-court factors matter?
+4. Case Studies: Do famous teams fit the pattern? ex. St. Peter's, Loyola Chicago, George Mason
+5. Can we predict it?
 
 
 The data comes a group of datasets from Kaggle 
@@ -39,28 +40,76 @@ library(tidyverse)
 ```{r}
 # Cleaning datasets
 
+# for plot 1
+upset_summary <- upset_seed_info |> group_by(YEAR) |>
+  summarise(num_upsets = n(),
+            avg_seed_diff = round(mean(`SEED DIFF`, na.rm=TRUE), 3))
+
+# for plot 2
+on_court_performance <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) |>
+  select(
+    Season, `Mapped ESPN Team Name`, Seed, 
+    `Net Rating`, `Adjusted Tempo`,
+    `Adjusted Offensive Efficiency`, `Avg Possession Length (Offense)`, eFGPct, TOPct, ORPct, FTRate, Off3PtFG, FTPct, Bench, 
+    `Adjusted Defensive Efficiency`, `Avg Possession Length (Defense)`, DefFT, Off3PtFG, 
+         ) |>
+  mutate(Seed = as.numeric(Seed)) |>
+  filter(Seed >= 10) |>
+  mutate(cinderella = if_else(sweet_16 == 1, 1, 0))
+  # create a cinderella vs non-cinderella team so 10>= and advanced to sweet 16
+  
+# create cinderella var first
+plot_data <- on_court_performance |>
+  select(
+    cinderella, `Net Rating`, `Adjusted Offensive Efficiency`, `Adjusted Defensive Efficiency`, eFGPct, ORPct, TOPct, FTRate, Off3PtFG, FTPct, `Adjusted Tempo`
+  )
+
+summary_data <- plot_data %>%
+  group_by(cinderella) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE))
+
+long_data <- summary_data %>%
+  pivot_longer(-cinderella, names_to = "metric", values_to = "value")
+
 ```
 
 ## Plot 1: 
-- How has the amount of upsets in March Madness changed over time? 
-- Plot idea: 
-- Data: upset count, upset seed info, seed results, tournament matchups
+- How likely are upsets?
+- Plot idea: lollipop plot, x=year, n=number of upsets, color=diff
+- Data: upset seed info --> upset_summary
 ```{r}
-# clean data & create plot
-# use upset_count dataset, then change Year into a categorical var, and look at how total number of upsets changes through the years
-# could look at total or difference, maybe make two plots
-
+ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
+  geom_segment(aes(x = YEAR, xend = YEAR, y = 0, yend = num_upsets,
+                   color = avg_seed_diff)) +
+  geom_point(aes(color = avg_seed_diff), size = 2) +
+  scale_color_viridis_c(name ="Avg Seed Diff") +
+  coord_flip() +
+  labs(
+    title = "March Madness Upsets Over Time",
+    x = "Year",
+    y = "Number of Upsets"
+  ) +
+  theme_minimal() +
+  geom_hline(yintercept = mean(upset_summary$num_upsets),
+             linetype = "dashed", color = "red", alpha = 0.5)
 ```
 
 
 ## Plot 2: 
-- What statistical characteristics define successful Cinderella team?
-- Plot idea: 
-- Data: shooting split, team rankings, ken bart, evan miya, 538
+- On-court performance
+- Plot idea: geom_tile
+- Data: dev --> on_court_performance --> other smaller datasets
 ```{r}
-# load data & create plot
-# look at 3pt rate, off reb % ...
-# then look at how teams are built 
+ggplot(long_data, aes(x = cinderella, y = metric, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(
+    title = "On-Court Profile of Cinderella vs Other Teams",
+    x = "",
+    y = "Metric",
+    fill = "Average Value"
+  ) +
+  theme_minimal()
 
 ```
 
