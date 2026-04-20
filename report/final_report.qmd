@@ -55,11 +55,21 @@ on_court_performance <- dev |> filter(`Post-Season Tournament Sorting Index` == 
          ) |>
   mutate(Seed = as.numeric(Seed)) |>
   filter(Seed >= 10) |>
-  mutate(cinderella = if_else(sweet_16 == 1, 1, 0))
-  # create a cinderella vs non-cinderella team so 10>= and advanced to sweet 16
+  mutate(cinderella = 0)
+  # create a cinderella vs non-cinderella team so 10 >= and advanced to sweet 16
+# need to find all 10+ seeds to make sweet 16 since 2002
+
+write_csv(on_court_performance, "on_court_performance.csv")
+
+library(readxl)
+data <- read_excel("data/new_mm_datasets/on_court_performance.xlsx")
+# bench and possession times have N/A values so maybe dont use them, so remove them for now
+# current on court performance dataset
+data <- data |> select(-c(`Avg Possession Length (Offense)`, `Avg Possession Length (Defense)`, Bench)) |>
+  relocate(cinderella, .after = Seed)
   
 # create cinderella var first
-plot_data <- on_court_performance |>
+plot_data <- data |>
   select(
     cinderella, `Net Rating`, `Adjusted Offensive Efficiency`, `Adjusted Defensive Efficiency`, eFGPct, ORPct, TOPct, FTRate, Off3PtFG, FTPct, `Adjusted Tempo`
   )
@@ -71,6 +81,20 @@ summary_data <- plot_data %>%
 long_data <- summary_data %>%
   pivot_longer(-cinderella, names_to = "metric", values_to = "value")
 
+
+# for plot 3
+# merge it with data to get the other columns back
+# columns to keep
+# other data to look for: age of players, team health, travel distance
+# this data is NA before 2007
+off_court_factors <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) |>
+  select(
+    Season, `Mapped ESPN Team Name`, Seed, `Short Conference Name`,
+    AvgHeight, CenterHeight, PFHeight, SFHeight, SGHeight, PGHeight, EffectiveHeight, Experience, 
+         ) |>
+  mutate(Seed = as.numeric(Seed)) |>
+  filter(Seed >= 10) |>
+  filter(Season)
 ```
 
 ## Plot 1: 
@@ -98,7 +122,9 @@ ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
 ## Plot 2: 
 - On-court performance
 - Plot idea: geom_tile
-- Data: dev --> on_court_performance --> other smaller datasets
+- Data: dev --> on_court_performance --> data --> plot_data --> summary_data --> long_data
+- maybe just use net rating and the adjusted efficiency metrics b/c there really isn't much difference, but maybe it shows its just more luck based
+- so could probably use a different style of plot
 ```{r}
 ggplot(long_data, aes(x = cinderella, y = metric, fill = value)) +
   geom_tile() +
@@ -114,7 +140,16 @@ ggplot(long_data, aes(x = cinderella, y = metric, fill = value)) +
 ```
 
 ## Plot 3: 
-- St. Peter's, Loyola Chicago, George Mason, maybe other teams
+- Other factors
+- Plot idea: geom_tile
+- Data: dev --> off_court_factors
+```{r}
+# load data & create plot
+
+```
+
+## Plot 4: 
+- St. Peter's, Loyola Chicago, George Mason, FGCU, maybe other teams
 - Plot idea:
 - Data: team results, tournament matchups, resumes, coach results
 ```{r}
@@ -122,7 +157,7 @@ ggplot(long_data, aes(x = cinderella, y = metric, fill = value)) +
 
 ```
 
-## Plot 4: 
+## Plot 5: 
 - Has the rise of the transfer portal and NIL changed the likelihood of upsets?
 - Plot idea:
 - Data: upset count, preseason ranks vs real ranks, 
