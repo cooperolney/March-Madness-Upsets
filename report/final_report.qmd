@@ -79,7 +79,8 @@ boxplot_data <- data %>%
     TOPct,
     `Adjusted Tempo`
   ) %>%
-  pivot_longer(-cinderella, names_to = "metric", values_to = "value")
+  pivot_longer(-cinderella, names_to = "metric", values_to = "value") |>
+  mutate(cinderella = if_else(cinderella == 1, "Yes", "No"))
 
 # for plot 3
 # merge it with data to get the other columns back
@@ -89,12 +90,60 @@ boxplot_data <- data %>%
 off_court_factors <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) |>
   select(
     Season, `Mapped ESPN Team Name`, Seed, `Short Conference Name`,
-    AvgHeight, CenterHeight, PFHeight, SFHeight, SGHeight, PGHeight, EffectiveHeight, Experience, 
+    AvgHeight, CenterHeight, PFHeight, SFHeight, SGHeight, PGHeight, EffectiveHeight, Experience, `Active Coaching Length` 
          ) |>
   mutate(Seed = as.numeric(Seed)) |>
   filter(Seed >= 10) |>
   filter(Season >= 2007)
-# add cinderella var
+
+# helper datasets
+cinderella_var_data <- data %>%
+  select(Season, `Mapped ESPN Team Name`, cinderella)
+
+coferences <- off_court_factors |> group_by(`Short Conference Name`) |> summarise(n = n())
+
+power_confs <- c("ACC", "B10", "B12", "SEC", "P12", "BE")
+
+# continue cleaning plot 3 data
+off_court_factors <- off_court_factors %>%
+  left_join(cinderella_var_data, by = c("Season", "Mapped ESPN Team Name")) |>
+  relocate(cinderella, .after = Seed) |>
+  arrange(desc(Season)) |>
+  mutate(
+    `Active Coaching Length` = na_if(`Active Coaching Length`, "Unknown")
+    ) |>
+  mutate(
+    `Active Coaching Length` = gsub(" years", "", `Active Coaching Length`),
+    `Active Coaching Length` = gsub(" year", "", `Active Coaching Length`),
+    `Active Coaching Length` = as.numeric(`Active Coaching Length`)
+  ) |>
+  mutate(
+    `Active Coaching Length` = if_else(`Mapped ESPN Team Name` == "Yale",
+                                       27,
+                                       `Active Coaching Length`),
+    `Active Coaching Length` = if_else(`Mapped ESPN Team Name` == "Gonzaga",
+                                       27,
+                                       `Active Coaching Length`)
+  ) |>
+  mutate(cinderella = if_else(cinderella == 1, "Yes", "No")) |>
+  mutate(
+    conference_type = if_else(`Short Conference Name` %in% power_confs,
+                              "Power",
+                              "Mid-Major")
+  ) |>
+  relocate(conference_type, .after = `Short Conference Name`)
+
+plot3_data <- off_court_factors |>
+  select(
+    cinderella,
+    conference_type,
+    Experience,
+    EffectiveHeight,
+  ) %>%
+  pivot_longer(cols = -c(cinderella, conference_type), 
+               names_to = "metric", 
+               values_to = "value")
+  
 ```
 
 ## Plot 1: 
@@ -127,7 +176,7 @@ ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
   - also could change the metrics shown, decide the best 6 out of the 10
   - change cinderella to yes and no instead of 1 and 0
 ```{r}
-ggplot(boxplot_data, aes(x = factor(cinderella), y = value)) +
+ggplot(boxplot_data, aes(x = factor(cinderella), y = value, fill = cinderella)) +
   geom_boxplot() +
   facet_wrap(~metric, scales = "free") +
   labs(
@@ -135,16 +184,28 @@ ggplot(boxplot_data, aes(x = factor(cinderella), y = value)) +
     x = "Cinderella",
     y = "Value"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "none"
+  )
 ```
 
 ## Plot 3: 
 - Other factors
-- Plot idea: geom_tile
-- Data: dev --> off_court_factors
+- Plot idea: geom_boxplot
+- Data: dev --> off_court_factors --> plot3_data
+- maybe add a third metric into the plot, and maybe remove conference type
 ```{r}
-# load data & create plot
-
+ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  facet_wrap(~metric, scales = "free") +
+  labs(
+    title = "Off-Court Factors Behind Cinderella Runs",
+    x = "Cinderella Team",
+    y = "Value",
+    fill = "Conference Type"
+  ) +
+  theme_minimal()
 ```
 
 ## Plot 4: 
