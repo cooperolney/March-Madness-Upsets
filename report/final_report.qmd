@@ -66,7 +66,8 @@ data <- read_excel("data/new_mm_datasets/on_court_performance.xlsx")
 # bench and possession times have N/A values so maybe dont use them, so remove them for now
 # current on court performance dataset
 data <- data |> select(-c(`Avg Possession Length (Offense)`, `Avg Possession Length (Defense)`, Bench)) |>
-  relocate(cinderella, .after = Seed)
+  relocate(cinderella, .after = Seed) |>
+  mutate(cinderella = if_else(cinderella == 1, "Yes", "No"))
   
 # create cinderella var first
 boxplot_data <- data %>%
@@ -79,8 +80,7 @@ boxplot_data <- data %>%
     TOPct,
     `Adjusted Tempo`
   ) %>%
-  pivot_longer(-cinderella, names_to = "metric", values_to = "value") |>
-  mutate(cinderella = if_else(cinderella == 1, "Yes", "No"))
+  pivot_longer(-cinderella, names_to = "metric", values_to = "value")
 
 # for plot 3
 # merge it with data to get the other columns back
@@ -143,6 +143,46 @@ plot3_data <- off_court_factors |>
   pivot_longer(cols = -c(cinderella, conference_type), 
                names_to = "metric", 
                values_to = "value")
+
+
+# Plot 4
+# merge on court and off court
+combined_data <- inner_join(off_court_factors, data,
+           by = c("Season", "Mapped ESPN Team Name", "Seed", "cinderella"))
+
+scaled_data <- combined_data %>%
+  mutate(
+    NetRating_z = scale(`Net Rating`),
+    OffEff_z = scale(`Adjusted Offensive Efficiency`),
+    DefEff_z = scale(`Adjusted Defensive Efficiency`),
+    Experience_z = scale(Experience),
+    EffHeight_z = scale(EffectiveHeight)
+  )
+
+avg_cinderella <- scaled_data %>%
+  filter(cinderella == "Yes") %>%
+  summarise(
+    team = "Avg Cinderella",
+    NetRating_z = mean(NetRating_z, na.rm = TRUE),
+    OffEff_z = mean(OffEff_z, na.rm = TRUE),
+    DefEff_z = mean(DefEff_z, na.rm = TRUE),
+    Experience_z = mean(Experience_z, na.rm = TRUE),
+    EffHeight_z = mean(EffHeight_z, na.rm = TRUE)
+  )
+
+case_teams <- scaled_data %>%
+  filter(
+    (`Mapped ESPN Team Name` == "Davidson" & Season == 2008) |
+    (`Mapped ESPN Team Name` == "Saint Peter's" & Season == 2022) |
+    (`Mapped ESPN Team Name` == "Loyola Chicago" & Season == 2018)
+  ) %>%
+  select(
+    team = `Mapped ESPN Team Name`,
+    NetRating_z, OffEff_z, DefEff_z, Experience_z, EffHeight_z
+  )
+
+plot4_data <- bind_rows(case_teams, avg_cinderella) |>
+  pivot_longer(-team, names_to = "metric", values_to = "value")
   
 ```
 
@@ -176,7 +216,7 @@ ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
   - also could change the metrics shown, decide the best 6 out of the 10
   - change cinderella to yes and no instead of 1 and 0
 ```{r}
-ggplot(boxplot_data, aes(x = factor(cinderella), y = value, fill = cinderella)) +
+ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
   geom_boxplot() +
   facet_wrap(~metric, scales = "free") +
   labs(
@@ -209,16 +249,24 @@ ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
 ```
 
 ## Plot 4: 
-- St. Peter's, Loyola Chicago, George Mason, FGCU, maybe other teams
-- Plot idea:
-- Data: team results, tournament matchups, resumes, coach results
+- St. Peter's(not very good), Loyola Chicago(decent team), Davidson (good 10 seed)
+- Plot idea: faceted geom_col
+- Data: dev --> ... --> combined_data --> scaled_data --> plot4_data
 ```{r}
-# load data & create plot
-
+ggplot(plot4_data, aes(x = metric, y = value, fill = metric)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~team) +
+  coord_flip() +
+  labs(
+    title = "Average Cinderella Team vs. Case Studies",
+    x = "",
+    y = "Standardized Value"
+  ) +
+  theme_minimal()
 ```
 
 ## Plot 5: 
-- Has the rise of the transfer portal and NIL changed the likelihood of upsets?
+- I want this plot to finish the story, maybe a regression plot or something else.
 - Plot idea:
 - Data: upset count, preseason ranks vs real ranks, 
 ```{r}
