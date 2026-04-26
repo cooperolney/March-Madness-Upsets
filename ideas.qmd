@@ -8,6 +8,26 @@ format: html
 
 
 # Introduction
+- Explain March Madness
+
+- Define upsets & Cinderella teams, why they matter
+
+**Main Research Question**
+What team characteristics are associated with unexpected success in March Madness?
+
+- Sub-Questions/Roadmap:
+1. How common are upsets? (provides context)
+2. What on-court stats matter?
+3. What off-court factors matter?
+4. Case Studies: Do famous teams fit the pattern? ex. St. Peter's, Loyola Chicago, Davidson
+5. Can we predict it?
+
+The data comes a group of datasets from Kaggle 
+
+
+
+
+
 - An introduction section, further introducing the data and giving the questions of interest you will be exploring in your project.
 
 **
@@ -58,6 +78,17 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 - Plot 2: What does a Cinderella look like
 - Plot 3: Case Studies
 - Plot 4: The Modern Era Shift
+
+## Plot 1
+- How likely are upsets?
+- Plot idea: lollipop plot, x=year, n=number of upsets, color=diff
+- Data: upset seed info --> upset_summary
+
+## Plot 2
+
+## Plot 3
+
+## Plot 4
 
 
 # Conclusion

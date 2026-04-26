@@ -12,24 +12,20 @@ format:
 
 
 # Introduction
-- Explain March Madness
+The NCAA Men's Basketball Tournament, commonly known as March Madness, is one of the most widely followed and unpredictable sporting events in the United States. It features 68 teams in a single elimination format, it includes many of the most well known teams in the country and some lesser known teams. This structures creates unexpected outcomes, making March Madness especially exciting for fans filling out brackets, however no one has ever achieved a perfect bracket in the history of the tournament.
 
-- Define upsets & Cinderella teams, why they matter
+One of the most defining features of March Madness is the occurrence of upsets, in which a lower seeded teams defeats a higher seeded team, for this data the seeds need to differ by at least three spots. Higher sees are generally expected to perform better, but the tournament consistently produces surprising results. The lower seeded teams that make deep runs in the tournament are often referred to as "Cinderella teams". These teams are a major reason why March Madness remains so exciting and difficult to predict.
 
-
+The data used in this analysis comes two datasets (dev & upset) sourced from Kaggle. Upset tracks the data on the number of upsets per tournament, the round the upset occurred and the seeds of the teams in those games. dev is a collection of different on the court metrics and other off the court statistics. Together, these variables off insight... (clean this up)
 
 **Main Research Question**
 What team characteristics are associated with unexpected success in March Madness?
 
-- Sub-Questions/Roadmap:
-1. How common are upsets? (provides context)
-2. What on-court stats matter?
-3. What off-court factors matter?
-4. Case Studies: Do famous teams fit the pattern? ex. St. Peter's, Loyola Chicago, George Mason
-5. Can we predict it?
+To address this question, this analysis explores several related areas. First, it examines how common upsets are in order to provide context for how frequently Cinderella teams actually are. It then investigates which on-court performance metrics are most associated with unexpected success. In addition, the analysis considers some off-court factors like team experience and physical attributes. Finally, famous Cinderella teams like St. Peters, Loyola Chicago, and Davidson are analyzed to determine whether they follow similar patterns.
 
+Some additional context about the structure of the tournament is important for interpreting these results. Since March Madness is single elimination it increasing the role of variability and short term performance. Additionally, games are played at neutral sites, which reduce advantages what occur in the regular season. These factors contribute to the unpredictability of outcomes and make it more challenging to identify consistent predictors of success.
 
-The data comes a group of datasets from Kaggle 
+However, this analysis will determine if there are patterns in the unexpected success in the tournament. Overall, these factors motivate a deeper exploration into the statistical and contextual forces of upsets and Cinderella runs in March Madness. (clean this up)
 
 
 # Visualizations
@@ -186,10 +182,9 @@ plot4_data <- bind_rows(case_teams, avg_cinderella) |>
   
 ```
 
-## Plot 1: 
-- How likely are upsets?
-- Plot idea: lollipop plot, x=year, n=number of upsets, color=diff
-- Data: upset seed info --> upset_summary
+## Plot 1: March Madness Upsets Over Time
+
+To understand how common upsets are in March Madness, we can look at the following lollipop plot, which shows the number of upsets in each tournament.
 ```{r}
 ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
   geom_segment(aes(x = YEAR, xend = YEAR, y = 0, yend = num_upsets,
@@ -206,6 +201,15 @@ ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
   geom_hline(yintercept = mean(upset_summary$num_upsets),
              linetype = "dashed", color = "red", alpha = 0.5)
 ```
+
+### Explain
+From the plot, we can see the number of upsets each year on the y-axis, with years ranging from 2008 to 2025 on the x-axis. The year with the fewest upsets is 2025, while 2014 has the most. The dashed red line represented the average number of upsets across all years in the dataset. In addition to the number of upsets, the color of each point represents the average seed difference in those games. For example, if a 12-seed beats a 5-seed, the seed difference is 7. Based on this, we see larger average seed differences in years like 2021 and 2013, and smaller differences in years like 2025 and 2009. 
+
+### Describe
+Looking more closely at 2025, there are not only fewer upsets, but the upsets that do occur tend to have smaller seed differences. Tournaments like this are often described as "chalky," meaning that the higher seeded teams generally perform as expected. On the other end, years like 2021 and 2022 show both a higher number of upsets and larger seed differences. One possible explanation for this is the impact of COVID-19 on recruiting and player development During this time, recruiting was more limited and disrupted, which may have led to better players ending up at smaller program, so then those smaller teams could be more likely to become Cinderella teams.
+
+### Connect
+Overall, this plot suggest that the number of upsets varies from year to year without a clear trend, which indicated that upset frequency alone may not be enough to explain unexpected success. This reinforces the idea to look deeper into team characteristics.
 
 
 ## Plot 2: 
