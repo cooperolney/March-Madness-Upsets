@@ -3,6 +3,12 @@ title: "ideas"
 format: html
 ---
 
+# Short presentation
+- for Wednesday
+- a couple of slides, 5 mins of less
+- introduce dataset, and question
+- show somes of the plots
+
 # Abstract
 - A one-paragraph abstract, giving a brief description of relevant data and any major findings.
 
@@ -85,10 +91,25 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 - Data: upset seed info --> upset_summary
 
 ## Plot 2
+- On-court performance
+- Plot idea: geom_boxplot
+- Data: dev --> on_court_performance --> data --> boxplot_data
+  - maybe use plotly to see team name for outliers
+  - also could change the metrics shown, decide the best 6 out of the 10
+  - change cinderella to yes and no instead of 1 and 0
 
 ## Plot 3
 
 ## Plot 4
+
+## Plot 5: 
+- I want this plot to finish the story, maybe a regression plot or something else.
+- Plot idea:
+- Data: upset count, preseason ranks vs real ranks, 
+```{r}
+# load data & create plot
+
+```
 
 
 # Conclusion

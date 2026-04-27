@@ -155,8 +155,8 @@ scaled_data <- combined_data %>%
     EffHeight_z = scale(EffectiveHeight)
   )
 
-avg_cinderella <- scaled_data %>%
-  filter(cinderella == "Yes") %>%
+avg_cinderella <- scaled_data |>
+  filter(cinderella == "Yes") |>
   summarise(
     team = "Avg Cinderella",
     NetRating_z = mean(NetRating_z, na.rm = TRUE),
@@ -213,12 +213,8 @@ Overall, this plot suggest that the number of upsets varies from year to year wi
 
 
 ## Plot 2: 
-- On-court performance
-- Plot idea: geom_boxplot
-- Data: dev --> on_court_performance --> data --> boxplot_data
-  - maybe use plotly to see team name for outliers
-  - also could change the metrics shown, decide the best 6 out of the 10
-  - change cinderella to yes and no instead of 1 and 0
+  
+To find out what on-court statistics have the most impact for Cinderella teams in March Madness, we can look at the following boxplot, which compares double digit seeded teams that are Cinderella teams and not.
 ```{r}
 ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
   geom_boxplot() +
@@ -233,6 +229,17 @@ ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
     legend.position = "none"
   )
 ```
+
+### Explain
+The plot compares double digit seeded teams that are Cinderella teams (won multiple games) and that are not. It looked at 6 difference metrics that are considered to be important to win basketball games. For Cinderella teams they had higher Adjusted Offensive Efficiency and much higher Net Rating, but surprisingly they had lower Adjusted Defensive Efficiency. For the other metrics they were pretty similar.
+
+### Describe
+It makes sense that Cinderella teams have a overall higher net rating, because Cinderella teams are more likely to be 10, 11, or 12 seeds rather than 15 or 16 because a lower seed should be better, resulting in a net rating.
+Also, based on the metrics from the plot, it seems like double digits seeds for more likely to win multiple games in March Madness (that makes then Cinderella teams) when they are very good offensively and it doesn't matter how bad they are defensively. This makes sense because teams that can get hot very quickly and score a lot of points, in a 1 game scenario they can get lucky and win a couple of games even if they aren't the better team. So offense is more important than defensive of these Cinderella teams.
+
+### Connect
+Overall, this plot suggests that if double digits seeds want to win multiple games in March Madness, and go on a Cinderella run, they should focus more on offensive than defense. To continue to look at on-court metrics, I would dive deeper into different offensive metrics, like 3pt, ect. To see if there are more specific metrics that can be associated with unexpected success.
+
 
 ## Plot 3: 
 - Other factors
@@ -256,6 +263,9 @@ ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
 - St. Peter's(not very good), Loyola Chicago(decent team), Davidson (good 10 seed)
 - Plot idea: faceted geom_col
 - Data: dev --> ... --> combined_data --> scaled_data --> plot4_data
+
+- to fix plot 4: off_court_factors has no "Yes" for cinderella
+
 ```{r}
 ggplot(plot4_data, aes(x = metric, y = value, fill = metric)) +
   geom_col(show.legend = FALSE) +
@@ -267,15 +277,6 @@ ggplot(plot4_data, aes(x = metric, y = value, fill = metric)) +
     y = "Standardized Value"
   ) +
   theme_minimal()
-```
-
-## Plot 5: 
-- I want this plot to finish the story, maybe a regression plot or something else.
-- Plot idea:
-- Data: upset count, preseason ranks vs real ranks, 
-```{r}
-# load data & create plot
-
 ```
 
 
