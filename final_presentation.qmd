@@ -7,46 +7,48 @@ editor: visual
 
 ```{r, echo = FALSE, message = FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 ```{r, echo = FALSE, message = FALSE}
-# Loading datasets
+# Loading kaggle datasets
 upset_seed_info <- read_csv(here::here("data/mm_data_kaggle/Upset Seed Info.csv"))
 
 dev <- read_csv(here::here("data/new_mm_datasets/DEV _ March Madness.csv"))
+```
 
-# Cleaning datasets
-# for plot 1
+```{r, echo = FALSE, message = FALSE}
+# plot 1
 upset_summary <- upset_seed_info |> group_by(YEAR) |>
   summarise(num_upsets = n(),
             avg_seed_diff = round(mean(`SEED DIFF`, na.rm=TRUE), 3))
+```
 
-# for plot 2
-on_court_performance <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) |>
+```{r, echo = FALSE, message = FALSE}
+# plot 2
+on_court_performance <- dev |> 
+  filter(`Post-Season Tournament Sorting Index` == 1) |>
   select(
     Season, `Mapped ESPN Team Name`, Seed, 
     `Net Rating`, `Adjusted Tempo`,
-    `Adjusted Offensive Efficiency`, `Avg Possession Length (Offense)`, eFGPct, TOPct, ORPct, FTRate, Off3PtFG, FTPct, Bench, 
-    `Adjusted Defensive Efficiency`, `Avg Possession Length (Defense)`, DefFT, Off3PtFG, 
-         ) |>
+    `Adjusted Offensive Efficiency`, 
+    eFGPct, TOPct, ORPct, FTRate, Off3PtFG, FTPct,
+    `Adjusted Defensive Efficiency`, DefFT
+  ) |>
   mutate(Seed = as.numeric(Seed)) |>
-  filter(Seed >= 10) |>
-  mutate(cinderella = 0)
-  # create a cinderella vs non-cinderella team so 10 >= and advanced to sweet 16
-# need to find all 10+ seeds to make sweet 16 since 2002
+  filter(Seed >= 10)
 
-write_csv(on_court_performance, "on_court_performance.csv")
+# write_csv(on_court_performance, "on_court_performance.csv")
 
-library(readxl)
+# read in manually cleaned data from excel
 data <- read_excel("data/new_mm_datasets/on_court_performance.xlsx")
-# bench and possession times have N/A values so maybe dont use them, so remove them for now
-# current on court performance dataset
+
 data <- data |> select(-c(`Avg Possession Length (Offense)`, `Avg Possession Length (Defense)`, Bench)) |>
   relocate(cinderella, .after = Seed) |>
   mutate(cinderella = if_else(cinderella == 1, "Yes", "No"))
-  
-# create cinderella var first
-boxplot_data <- data %>%
+
+# plot dataset
+boxplot_data <- data |>
   select(
     cinderella,
     `Net Rating`,
@@ -55,14 +57,13 @@ boxplot_data <- data %>%
     ORPct,
     TOPct,
     `Adjusted Tempo`
-  ) %>%
+  ) |>
   pivot_longer(-cinderella, names_to = "metric", values_to = "value")
+```
 
-# for plot 3
-# merge it with data to get the other columns back
-# columns to keep
-# other data to look for: age of players, team health, travel distance
-# this data is NA before 2007
+
+```{r, echo = FALSE, message = FALSE}
+# plot 3
 off_court_factors <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) |>
   select(
     Season, `Mapped ESPN Team Name`, Seed, `Short Conference Name`,
@@ -73,60 +74,42 @@ off_court_factors <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) 
   filter(Season >= 2007)
 
 # helper datasets
-cinderella_var_data <- data %>%
+cinderella_var_data <- data |>
   select(Season, `Mapped ESPN Team Name`, cinderella)
 
-coferences <- off_court_factors |> group_by(`Short Conference Name`) |> summarise(n = n())
+off_court_factors <- off_court_factors |>
+  left_join(cinderella_var_data, 
+            by = c("Season", "Mapped ESPN Team Name"))
 
 power_confs <- c("ACC", "B10", "B12", "SEC", "P12", "BE")
 
-# continue cleaning plot 3 data
-off_court_factors <- off_court_factors %>%
-  left_join(cinderella_var_data, by = c("Season", "Mapped ESPN Team Name")) |>
-  relocate(cinderella, .after = Seed) |>
-  arrange(desc(Season)) |>
+off_court_factors <- off_court_factors |>
   mutate(
-    `Active Coaching Length` = na_if(`Active Coaching Length`, "Unknown")
-    ) |>
-  mutate(
-    `Active Coaching Length` = gsub(" years", "", `Active Coaching Length`),
-    `Active Coaching Length` = gsub(" year", "", `Active Coaching Length`),
-    `Active Coaching Length` = as.numeric(`Active Coaching Length`)
-  ) |>
-  mutate(
-    `Active Coaching Length` = if_else(`Mapped ESPN Team Name` == "Yale",
-                                       27,
-                                       `Active Coaching Length`),
-    `Active Coaching Length` = if_else(`Mapped ESPN Team Name` == "Gonzaga",
-                                       27,
-                                       `Active Coaching Length`)
-  ) |>
-  mutate(cinderella = if_else(cinderella == 1, "Yes", "No")) |>
-  mutate(
-    conference_type = if_else(`Short Conference Name` %in% power_confs,
-                              "Power",
-                              "Mid-Major")
-  ) |>
-  relocate(conference_type, .after = `Short Conference Name`)
+    `Active Coaching Length` = na_if(`Active Coaching Length`, "Unknown"),
+    `Active Coaching Length` = gsub(" years?| year", "", `Active Coaching Length`),
+    `Active Coaching Length` = as.numeric(`Active Coaching Length`),
+    conference_type = if_else(
+      `Short Conference Name` %in% power_confs, "Power", "Mid-Major"
+    )
+  )
 
+# plot data
 plot3_data <- off_court_factors |>
-  select(
-    cinderella,
-    conference_type,
-    Experience,
-    EffectiveHeight,
-  ) %>%
-  pivot_longer(cols = -c(cinderella, conference_type), 
-               names_to = "metric", 
-               values_to = "value")
+  select(cinderella, conference_type, Experience, EffectiveHeight) |>
+  pivot_longer(
+    cols = -c(cinderella, conference_type),
+    names_to = "metric",
+    values_to = "value"
+  )
+```
 
 
-# Plot 4
-# merge on court and off court
-combined_data <- inner_join(off_court_factors, data,
-           by = c("Season", "Mapped ESPN Team Name", "Seed", "cinderella"))
+```{r, echo = FALSE, message = FALSE}
+# plot 4
+combined_data <- inner_join(off_court_factors, data, 
+                            by = c("Season", "Mapped ESPN Team Name", "Seed", "cinderella"))
 
-scaled_data <- combined_data %>%
+scaled_data <- combined_data |>
   mutate(
     NetRating_z = scale(`Net Rating`),
     OffEff_z = scale(`Adjusted Offensive Efficiency`),
@@ -135,8 +118,8 @@ scaled_data <- combined_data %>%
     EffHeight_z = scale(EffectiveHeight)
   )
 
-avg_cinderella <- scaled_data %>%
-  filter(cinderella == "Yes") %>%
+avg_cinderella <- scaled_data |>
+  filter(cinderella == "Yes") |>
   summarise(
     team = "Avg Cinderella",
     NetRating_z = mean(NetRating_z, na.rm = TRUE),
@@ -146,20 +129,18 @@ avg_cinderella <- scaled_data %>%
     EffHeight_z = mean(EffHeight_z, na.rm = TRUE)
   )
 
-case_teams <- scaled_data %>%
+case_teams <- scaled_data |>
   filter(
     (`Mapped ESPN Team Name` == "Davidson" & Season == 2008) |
     (`Mapped ESPN Team Name` == "Saint Peter's" & Season == 2022) |
     (`Mapped ESPN Team Name` == "Loyola Chicago" & Season == 2018)
-  ) %>%
-  select(
-    team = `Mapped ESPN Team Name`,
-    NetRating_z, OffEff_z, DefEff_z, Experience_z, EffHeight_z
-  )
+  ) |>
+  select(team = `Mapped ESPN Team Name`, 
+         NetRating_z, OffEff_z, DefEff_z, Experience_z, EffHeight_z)
 
+# plot data
 plot4_data <- bind_rows(case_teams, avg_cinderella) |>
   pivot_longer(-team, names_to = "metric", values_to = "value")
-  
 ```
 
 ## Data Introduction
@@ -183,8 +164,7 @@ plot4_data <- bind_rows(case_teams, avg_cinderella) |>
 - What off-court factors matter?
 - Case Studies: Do famous teams fit the pattern? ex. St. Peter's, Loyola Chicago, Davidson
 
-## Plot 1: March Madness Upsets Over Time
-
+## Plot 1
 ```{r}
 ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
   geom_segment(aes(x = YEAR, xend = YEAR, y = 0, yend = num_upsets,
@@ -203,7 +183,7 @@ ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
 ```
 
 
-## Plot 2: 
+## Plot 2
 ```{r}
 ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
   geom_boxplot() +
@@ -213,15 +193,15 @@ ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
     x = "Cinderella",
     y = "Value"
   ) +
-  theme_minimal(base_size = 24) +
+  theme_minimal(base_size = 18) +
   theme(
     legend.position = "none"
   )
 ```
 
-## Plot 3:
+## Plot 3
 ```{r}
-ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
+ggplot(plot3_data, aes(x = cinderella, y = value)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
   facet_wrap(~metric, scales = "free") +
   labs(
@@ -233,7 +213,7 @@ ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
   theme_minimal(base_size = 24)
 ```
 
-## Plot 4:
+## Plot 4
 ```{r}
 ggplot(plot4_data, aes(x = metric, y = value, fill = metric)) +
   geom_col(show.legend = FALSE) +

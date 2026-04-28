@@ -31,6 +31,7 @@ However, this analysis will determine if there are patterns in the unexpected su
 # Visualizations
 ```{r}
 library(tidyverse)
+library(readxl)
 ```
 
 ```{r}
@@ -73,7 +74,7 @@ data <- data |> select(-c(`Avg Possession Length (Offense)`, `Avg Possession Len
   mutate(cinderella = if_else(cinderella == 1, "Yes", "No"))
 
 # plot dataset
-boxplot_data <- data %>%
+boxplot_data <- data |>
   select(
     cinderella,
     `Net Rating`,
@@ -82,7 +83,7 @@ boxplot_data <- data %>%
     ORPct,
     TOPct,
     `Adjusted Tempo`
-  ) %>%
+  ) |>
   pivot_longer(-cinderella, names_to = "metric", values_to = "value")
 ```
 
@@ -98,30 +99,28 @@ off_court_factors <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) 
   filter(Season >= 2007)
 
 # helper datasets
-cinderella_var_data <- data %>%
+cinderella_var_data <- data |>
   select(Season, `Mapped ESPN Team Name`, cinderella)
 
-off_court_factors <- off_court_factors %>%
+off_court_factors <- off_court_factors |>
   left_join(cinderella_var_data, 
             by = c("Season", "Mapped ESPN Team Name"))
 
 power_confs <- c("ACC", "B10", "B12", "SEC", "P12", "BE")
 
-off_court_factors <- off_court_factors %>%
+off_court_factors <- off_court_factors |>
   mutate(
     `Active Coaching Length` = na_if(`Active Coaching Length`, "Unknown"),
     `Active Coaching Length` = gsub(" years?| year", "", `Active Coaching Length`),
     `Active Coaching Length` = as.numeric(`Active Coaching Length`),
     conference_type = if_else(
-      `Short Conference Name` %in% power_confs,
-      "Power",
-      "Mid-Major"
+      `Short Conference Name` %in% power_confs, "Power", "Mid-Major"
     )
   )
 
 # plot data
-plot3_data <- off_court_factors %>%
-  select(cinderella, conference_type, Experience, EffectiveHeight) %>%
+plot3_data <- off_court_factors |>
+  select(cinderella, conference_type, Experience, EffectiveHeight) |>
   pivot_longer(
     cols = -c(cinderella, conference_type),
     names_to = "metric",
@@ -131,13 +130,10 @@ plot3_data <- off_court_factors %>%
 
 ### Plot 4
 ```{r}
-combined_data <- inner_join(
-  off_court_factors,
-  data,
-  by = c("Season", "Mapped ESPN Team Name", "Seed", "cinderella")
-)
+combined_data <- inner_join(off_court_factors, data, 
+                            by = c("Season", "Mapped ESPN Team Name", "Seed", "cinderella"))
 
-scaled_data <- combined_data %>%
+scaled_data <- combined_data |>
   mutate(
     NetRating_z = scale(`Net Rating`),
     OffEff_z = scale(`Adjusted Offensive Efficiency`),
@@ -146,8 +142,8 @@ scaled_data <- combined_data %>%
     EffHeight_z = scale(EffectiveHeight)
   )
 
-avg_cinderella <- scaled_data %>%
-  filter(cinderella == "Yes") %>%
+avg_cinderella <- scaled_data |>
+  filter(cinderella == "Yes") |>
   summarise(
     team = "Avg Cinderella",
     NetRating_z = mean(NetRating_z, na.rm = TRUE),
@@ -157,16 +153,14 @@ avg_cinderella <- scaled_data %>%
     EffHeight_z = mean(EffHeight_z, na.rm = TRUE)
   )
 
-case_teams <- scaled_data %>%
+case_teams <- scaled_data |>
   filter(
     (`Mapped ESPN Team Name` == "Davidson" & Season == 2008) |
     (`Mapped ESPN Team Name` == "Saint Peter's" & Season == 2022) |
     (`Mapped ESPN Team Name` == "Loyola Chicago" & Season == 2018)
-  ) %>%
-  select(
-    team = `Mapped ESPN Team Name`,
-    NetRating_z, OffEff_z, DefEff_z, Experience_z, EffHeight_z
-  )
+  ) |>
+  select(team = `Mapped ESPN Team Name`, 
+         NetRating_z, OffEff_z, DefEff_z, Experience_z, EffHeight_z)
 
 # plot data
 plot4_data <- bind_rows(case_teams, avg_cinderella) |>
@@ -194,19 +188,19 @@ ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
              linetype = "dashed", color = "red", alpha = 0.5)
 ```
 
-### Explain
+### Describe
 From the plot, we can see the number of upsets each year on the y-axis, with years ranging from 2008 to 2025 on the x-axis. The year with the fewest upsets is 2025, while 2014 has the most. The dashed red line represented the average number of upsets across all years in the dataset. In addition to the number of upsets, the color of each point represents the average seed difference in those games. For example, if a 12-seed beats a 5-seed, the seed difference is 7. Based on this, we see larger average seed differences in years like 2021 and 2013, and smaller differences in years like 2025 and 2009. 
 
-### Describe
+### Explain
 Looking more closely at 2025, there are not only fewer upsets, but the upsets that do occur tend to have smaller seed differences. Tournaments like this are often described as "chalky," meaning that the higher seeded teams generally perform as expected. On the other end, years like 2021 and 2022 show both a higher number of upsets and larger seed differences. One possible explanation for this is the impact of COVID-19 on recruiting and player development During this time, recruiting was more limited and disrupted, which may have led to better players ending up at smaller program, so then those smaller teams could be more likely to become Cinderella teams.
 
 ### Connect
 Overall, this plot suggest that the number of upsets varies from year to year without a clear trend, which indicated that upset frequency alone may not be enough to explain unexpected success. This reinforces the idea to look deeper into team characteristics.
 
 
-## Plot 2: 
-  
-To find out what on-court statistics have the most impact for Cinderella teams in March Madness, we can look at the following boxplot, which compares double digit seeded teams that are Cinderella teams and not.
+## Plot 2: On-court Metrics
+
+To understand what on-court statistics are associated with Cinderella teams in March Madness, we can examine the following boxplot. This plot compares double-digit seeded teams that became Cinderella teams to those that did not.
 ```{r}
 ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
   geom_boxplot() +
@@ -222,24 +216,21 @@ ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
   )
 ```
 
-### Explain
-The plot compares double digit seeded teams that are Cinderella teams (won multiple games) and that are not. It looked at 6 difference metrics that are considered to be important to win basketball games. For Cinderella teams they had higher Adjusted Offensive Efficiency and much higher Net Rating, but surprisingly they had lower Adjusted Defensive Efficiency. For the other metrics they were pretty similar.
-
 ### Describe
-It makes sense that Cinderella teams have a overall higher net rating, because Cinderella teams are more likely to be 10, 11, or 12 seeds rather than 15 or 16 because a lower seed should be better, resulting in a net rating.
-Also, based on the metrics from the plot, it seems like double digits seeds for more likely to win multiple games in March Madness (that makes then Cinderella teams) when they are very good offensively and it doesn't matter how bad they are defensively. This makes sense because teams that can get hot very quickly and score a lot of points, in a 1 game scenario they can get lucky and win a couple of games even if they aren't the better team. So offense is more important than defensive of these Cinderella teams.
+The plot compares double-digit seeded teams across six difference metrics that are commonly used to evaluate basketball performance. These include metrics such as Adjusted Defensive Efficiency, Adjusted Offensive Efficiency, and Net Rating. Looking at the distributions, Cinderella teams tend to have higher Adjusted Offensive Efficiency and a noticeably higher Net Rating compared to non-Cinderella teams. However, somewhat surprisingly, they appear to have a worse Adjusted Defensive Efficiency. For the remaining metrics, the differences between the two groups are minuscule.
+
+### Explain
+One possible explanation for the higher Net Rating is that Cinderella teams are more likely to come from the stronger end of the double-digit seed range, such as 10, 11, or 12 seeds, rather than 15 or 16 seeds. Since these teams are generally stronger overall, this could help explain their higher Net Rating. More importantly, the results suggest that offensive performance may play a larger role than defense in these unexpected tournament runs. teams that are highly efficient offensively can "get hot" and score at a high level, which is especially impactful in a single elimination setting where one strong performance can be enough to advance. Even if these teams are weaker defensively, a strong offense may allow them to win multiple games. 
 
 ### Connect
-Overall, this plot suggests that if double digits seeds want to win multiple games in March Madness, and go on a Cinderella run, they should focus more on offensive than defense. To continue to look at on-court metrics, I would dive deeper into different offensive metrics, like 3pt, ect. To see if there are more specific metrics that can be associated with unexpected success.
+Overall, this plot suggests that for double-digit seeded teams, offensive strength is more strongly associated with making a Cinderella run than defensive performance. This provides initial evidence that certain on-court characteristics, particularly those related to scoring efficiency may help explain unexpected success in March Madness. To build on this, a deeper look into more specific offensive metrics could provide further insight into what drives this unexpected success.
 
 
-## Plot 3: 
-- Other factors
-- Plot idea: geom_boxplot
-- Data: dev --> off_court_factors --> plot3_data
-- maybe add a third metric into the plot, and maybe remove conference type
+## Plot 3:
+
+To understand what off-court factors may influence unexpected success in March Madness, we can examine the following boxplot. This plot compares double-digit seeded teams that became Cinderella teams to those that did not, across several off-court indicators.
 ```{r}
-ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
+ggplot(plot3_data, aes(x = cinderella, y = value)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
   facet_wrap(~metric, scales = "free") +
   labs(
@@ -249,15 +240,26 @@ ggplot(plot3_data, aes(x = cinderella, y = value, fill = conference_type)) +
     fill = "Conference Type"
   ) +
   theme_minimal()
+
+plot3_data |> group_by(conference_type) |> summarise(n())
 ```
+
+### Describe
+The plot compares teams across a few different factors, including effective height and team experience. Effective height represents the average height of players on the roster weighted by minutes played, where a value of 0 corresponds to the national average and positive values indicate above average size. Team experience measures the average number of years the starting five players have been in college, where a value of 0 represents a starting lineup made entirely of freshmen.
+
+Looking at the distributions, there are relatively small differences between Cinderella and non-Cinderella teams across these two factors. For effective height, the median slightly increases for teams that make Cinderella runs. For experience, there is no clear advantage for more experienced teams, which might be expected. In fact, Cinderella teams appear to be slightly less experienced on average.
+
+### Explain
+One possible explanation for the height result is that size can provide advantages in areas like rebounding and defense, which may help double-digit seeded teams compete with stronger opponents. However, the large overlap in the IQR suggests that effective height alone is not a reliable predictor of unexpected success. The results for experience are more surprising, as it is often assumed that older, more experienced teams perform better in high pressure situations like March Madness. Instead, these results suggest that younger trams may be just as capable of making unexpected runs.
+
+### Connect
+Overall, this plot suggest that these off-court factors do not have as strong of a relationship with Cinderella runs as the on-court metrics explored in the previous analysis. While there are small differences, they are not consistent enough to clearly explain unexpected success. This reinforces the idea that performance based metrics may play a more important role. It also suggests that other unmeasured factors, such as game location, matchup dynamics, or randomness in a single elimination format could also contribute to these outcomes.
+
 
 ## Plot 4: 
 - St. Peter's(not very good), Loyola Chicago(decent team), Davidson (good 10 seed)
 - Plot idea: faceted geom_col
 - Data: dev --> ... --> combined_data --> scaled_data --> plot4_data
-
-- to fix plot 4: off_court_factors has no "Yes" for cinderella
-
 ```{r}
 ggplot(plot4_data, aes(x = metric, y = value, fill = metric)) +
   geom_col(show.legend = FALSE) +

@@ -99,6 +99,10 @@ How have March Madness upsets evolved over time, and what factors explain the ri
   - change cinderella to yes and no instead of 1 and 0
 
 ## Plot 3
+- Other factors
+- Plot idea: geom_boxplot
+- Data: dev --> off_court_factors --> plot3_data
+- maybe add a third metric into the plot, and maybe remove conference type
 
 ## Plot 4
 
