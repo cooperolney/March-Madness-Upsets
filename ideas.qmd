@@ -105,6 +105,9 @@ How have March Madness upsets evolved over time, and what factors explain the ri
 - maybe add a third metric into the plot, and maybe remove conference type
 
 ## Plot 4
+- St. Peter's(not very good), Loyola Chicago(decent team), Davidson (good 10 seed)
+- Plot idea: faceted geom_col
+- Data: dev --> ... --> combined_data --> scaled_data --> plot4_data
 
 ## Plot 5: 
 - I want this plot to finish the story, maybe a regression plot or something else.
