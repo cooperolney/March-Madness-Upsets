@@ -5,12 +5,118 @@ format: gfm
 
 ### Data Introduction
 
+The NCAA Men's Basketball Tournament, commonly known as March Madness, is one of the most unpredictable sporting events in the United States. It features 68 teams competing in a single elimination format, this structure creates an environment where unexpected outcomes can occur. Which is why this analysis focuses on upsets and Cinderella teams, which are double-digit seeded teams that win multiple games in the tournament
+
+The data used in this analysis comes from two datasets sourced from Kaggle. One dataset contains information on game outcomes, including the number of upsets in each tournament and the seed matchups involved. The second dataset includes team-level statistics, such as offensive and defensive efficiency metrics. Together, these datasets allow for an analysis of how team characteristics relate to unexpected success in March Madness.
+
 ### Questions of Interest
 
-### Plot
+#### Main Research Question: 
 
-```{r}
+- What team characteristics are associated with unexpected success in March Madness?
 
+To answer this, the analysis focuses on:
+
+- How common upsets are across different tournaments
+- Which on-court performance metrics are associated with Cinderella teams
+- Which off-court factors are associated with Cinderella teams
+- Whether all Cinderella teams follow similar patterns, using case studies such as Davidson, Loyola Chicago, and Saint Peter's
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Loading kaggle datasets
+upset_seed_info <- read_csv(here::here("data/mm_data_kaggle/Upset Seed Info.csv"))
+
+dev <- read_csv(here::here("data/new_mm_datasets/DEV _ March Madness.csv"))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+upset_summary <- upset_seed_info |> group_by(YEAR) |>
+  summarise(num_upsets = n(),
+            avg_seed_diff = round(mean(`SEED DIFF`, na.rm=TRUE), 3))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+on_court_performance <- dev |> 
+  filter(`Post-Season Tournament Sorting Index` == 1) |>
+  select(
+    Season, `Mapped ESPN Team Name`, Seed, 
+    `Net Rating`, `Adjusted Tempo`,
+    `Adjusted Offensive Efficiency`, 
+    eFGPct, TOPct, ORPct, FTRate, Off3PtFG, FTPct,
+    `Adjusted Defensive Efficiency`, DefFT
+  ) |>
+  mutate(Seed = as.numeric(Seed)) |>
+  filter(Seed >= 10)
+
+# write_csv(on_court_performance, "on_court_performance.csv")
+
+# read in manually cleaned data from excel
+data <- read_excel("data/new_mm_datasets/on_court_performance.xlsx")
+
+data <- data |> select(-c(`Avg Possession Length (Offense)`, `Avg Possession Length (Defense)`, Bench)) |>
+  relocate(cinderella, .after = Seed) |>
+  mutate(cinderella = if_else(cinderella == 1, "Yes", "No"))
+
+# plot dataset
+boxplot_data <- data |>
+  select(
+    cinderella,
+    `Net Rating`,
+    `Adjusted Offensive Efficiency`,
+    `Adjusted Defensive Efficiency`,
+    ORPct,
+    TOPct,
+    `Adjusted Tempo`
+  ) |>
+  pivot_longer(-cinderella, names_to = "metric", values_to = "value")
+```
+
+### Plot 1: March Madness Upsets Over Time
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
+  geom_segment(aes(x = YEAR, xend = YEAR, y = 0, yend = num_upsets,
+                   color = avg_seed_diff)) +
+  geom_point(aes(color = avg_seed_diff), size = 2) +
+  scale_color_viridis_c(name ="Avg Seed Diff") +
+  coord_flip() +
+  labs(
+    title = "March Madness Upsets Over Time",
+    x = "Year",
+    y = "Number of Upsets"
+  ) +
+  theme_minimal() +
+  geom_hline(yintercept = mean(upset_summary$num_upsets),
+             linetype = "dashed", color = "red", alpha = 0.5)
+```
+
+### Plot 2: On-Court Metrics: Cinderella vs Non-Cinderella Teams
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
+  geom_boxplot() +
+  facet_wrap(~metric, scales = "free") +
+  labs(
+    title = "On-Court Metrics: Cinderella vs Non-Cinderella Teams",
+    x = "Cinderella",
+    y = "Value"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(
+    "Yes" = "#C3EEFF",
+    "No" = "#F88158"
+  ))
+```
+
+### Key Takeaways
+
+The results show that while upsets vary from year to year with no clear trend, certain on-court metrics, especially offensive efficiency and net rating are more strongly associated with teams that achieve unexpected success. In contrast, the off-court factors that were looked at show weaker relationships. The case studies that were reviewed show how there are common patterns among Cinderella teams, but there is still variability across different tournament runs. 
+
+Overall, the findings suggest that offensively oriented teams are more likely to succeed in a single elimination setting, while still reinforcing the unpredictability that defines March Madness.
 
