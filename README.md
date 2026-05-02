@@ -8,7 +8,7 @@ is one of the most unpredictable sporting events in the United States.
 It features 68 teams competing in a single elimination format, this
 structure creates an environment where unexpected outcomes can occur.
 Which is why this analysis focuses on upsets and Cinderella teams, which
-are double-digit seeded teams that win multiple games in the tournament
+are double-digit seeded teams that win multiple games in the tournament.
 
 The data used in this analysis comes from two datasets sourced from
 Kaggle. One dataset contains information on game outcomes, including the
@@ -27,12 +27,12 @@ March Madness.
 
 To answer this, the analysis focuses on:
 
-- How common upsets are across different tournaments
+- How common upsets are across different tournaments.
 - Which on-court performance metrics are associated with Cinderella
-  teams
-- Which off-court factors are associated with Cinderella teams
+  teams.
+- Which off-court factors are associated with Cinderella teams.
 - Whether all Cinderella teams follow similar patterns, using case
-  studies such as Davidson, Loyola Chicago, and Saint Peter’s
+  studies such as Davidson, Loyola Chicago, and Saint Peter’s.
 
 ### Plot 1: March Madness Upsets Over Time
 
@@ -53,5 +53,6 @@ are common patterns among Cinderella teams, but there is still
 variability across different tournament runs.
 
 Overall, the findings suggest that offensively oriented teams are more
-likely to succeed in a single elimination setting, while still
-reinforcing the unpredictability that defines March Madness.
+likely to acheive unexpected success and go on Cinderella runs in a
+single elimination setting, while still reinforcing the unpredictability
+that defines March Madness.
