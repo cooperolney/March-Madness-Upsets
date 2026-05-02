@@ -6,6 +6,9 @@ format:
   html:
     embed-resources: true
 ---
+### GitHub Repository
+
+[https://github.com/cooperolney/March-Madness-Upsets](https://github.com/cooperolney/March-Madness-Upsets)
 
 # Abstract
 This project analyzes factors associated with unexpected success in March Madness, with a focus on "Cinderella teams," or double-digit seeded teams that win multiple games. The data used includes historical upset data and team level performance metrics, this analysis explores how frequently upsets occur and which characteristics are most associated with these outcomes. Through several visualizations, the results show that while upsets vary from year to year, certain on-court metrics such as offensive efficiency and net rating are more strongly associated with teams that achieve unexpected success. In contrast, off-court factors such as team experience and team height show weaker and less consistent relationships. Case studies of notable Cinderella teams further highlight common patterns and the variability that exists across different Cinderella runs. Overall, the findings suggests that offensively oriented teams are more likely to succeed in a single elimination setting, while also reinforcing the unpredictability that defines March Madness.
