@@ -18,7 +18,7 @@ One of the most defining features of March Madness is the occurrence of upsets, 
 
 The data used in this analysis comes two datasets sourced from Kaggle: One focused on upset outcomes, and the other contained team level performance metrics. The upset (Upset Seed Info.csv) dataset includes information on the number of upsets in each tournament, the rounds in which they occurred, and the seed matchups involved. The second dataset (DEV _ March Madness.csv) contains a wide range of team statistics, including both on-court performance metrics and off-court characteristics. Together, these datasets provide a foundation to answer the main research question.
 
-**Main Research Question**
+**Main Research Question:**
 What team characteristics are associated with unexpected success in March Madness?
 
 To address this question, this analysis explores several related areas. First, it examines how common upsets are in order to provide context for how frequently Cinderella teams occur. It then investigates which on-court performance metrics are most associated with unexpected success. In addition, the analysis considers some off-court factors like team experience and team height. Finally, it compares the average Cinderella team to some notable Cinderella teams, including Davidson, Loyola Chicago, and Saint Peters, they are then analyzed to determine whether they follow similar patterns.
@@ -28,30 +28,28 @@ Some additional context about the structure of the tournament is important for i
 Overall, while the tournament is inherently unpredictable, this analysis aims to determine whether underlying patterns exist in the teams that achieve unexpected success. These factors motivate a deeper exploration into the statistical and contextual drivers of upsets and Cinderella runs in March Madness.
 
 
-# Visualizations
-```{r}
+# Cleaning Data
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(readxl)
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Loading kaggle datasets
 upset_seed_info <- read_csv(here::here("data/mm_data_kaggle/Upset Seed Info.csv"))
 
 dev <- read_csv(here::here("data/new_mm_datasets/DEV _ March Madness.csv"))
 ```
 
-## Cleaning datasets
-
 ### Plot 1
-```{r}
+```{r message=FALSE, warning=FALSE}
 upset_summary <- upset_seed_info |> group_by(YEAR) |>
   summarise(num_upsets = n(),
             avg_seed_diff = round(mean(`SEED DIFF`, na.rm=TRUE), 3))
 ```
 
 ### Plot 2
-```{r}
+```{r message=FALSE, warning=FALSE}
 on_court_performance <- dev |> 
   filter(`Post-Season Tournament Sorting Index` == 1) |>
   select(
@@ -67,7 +65,7 @@ on_court_performance <- dev |>
 # write_csv(on_court_performance, "on_court_performance.csv")
 
 # read in manually cleaned data from excel
-data <- read_excel("data/new_mm_datasets/on_court_performance.xlsx")
+data <- read_excel(here::here("data/new_mm_datasets/on_court_performance.xlsx"))
 
 data <- data |> select(-c(`Avg Possession Length (Offense)`, `Avg Possession Length (Defense)`, Bench)) |>
   relocate(cinderella, .after = Seed) |>
@@ -88,7 +86,7 @@ boxplot_data <- data |>
 ```
 
 ### Plot 3
-```{r}
+```{r message=FALSE, warning=FALSE}
 off_court_factors <- dev |> filter(`Post-Season Tournament Sorting Index` == 1) |>
   select(
     Season, `Mapped ESPN Team Name`, Seed, `Short Conference Name`,
@@ -129,7 +127,7 @@ plot3_data <- off_court_factors |>
 ```
 
 ### Plot 4
-```{r}
+```{r message=FALSE, warning=FALSE}
 combined_data <- inner_join(off_court_factors, data, 
                             by = c("Season", "Mapped ESPN Team Name", "Seed", "cinderella"))
 
@@ -167,11 +165,12 @@ plot4_data <- bind_rows(case_teams, avg_cinderella) |>
   pivot_longer(-team, names_to = "metric", values_to = "value")
 ```
 
+# Visualizations
 
 ## Plot 1: March Madness Upsets Over Time
 
 To understand how common upsets are in March Madness, we can look at the following lollipop plot, which shows the number of upsets in each tournament.
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(upset_summary, aes(x = YEAR, y = num_upsets)) +
   geom_segment(aes(x = YEAR, xend = YEAR, y = 0, yend = num_upsets,
                    color = avg_seed_diff)) +
@@ -198,7 +197,7 @@ Overall, this plot suggest that the number of upsets varies from year to year wi
 ## Plot 2: On-Court Metrics: Cinderella vs Non-Cinderella Teams
 
 To understand what on-court statistics are associated with Cinderella teams in March Madness, we can examine the following boxplot. This plot compares double-digit seeded teams that became Cinderella teams to those that did not.
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(boxplot_data, aes(x = cinderella, y = value, fill = cinderella)) +
   geom_boxplot() +
   facet_wrap(~metric, scales = "free") +
@@ -225,7 +224,7 @@ Overall, this plot suggests that for double-digit seeded teams, offensive streng
 ## Plot 3: Off-Court Factors Behind Cinderella Runs
 
 To understand what off-court factors may influence unexpected success in March Madness, we can examine the following boxplot. This plot compares double-digit seeded teams that became Cinderella teams to those that did not, across several off-court indicators.
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(plot3_data, aes(x = cinderella, y = value, fill = cinderella)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
   facet_wrap(~metric, scales = "free") +
@@ -254,7 +253,7 @@ Overall, this plot suggest that these off-court factors do not have as strong of
 ## Plot 4: Average Cinderella Team vs. Case Studies
 
 Now we will look at how a few well-known Cinderella teams compare to the "average" Cinderella team based on the metrics explored earlier. Each of these teams is remembered for a different reason, but they all achieved unexpected success in March Madness.
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(plot4_data, aes(x = metric, y = value, fill = metric)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~team) +
